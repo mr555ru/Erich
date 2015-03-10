@@ -1,0 +1,10 @@
+int d = 15
+print(to_str(d))
+int d
+print(to_str(d))
+char d
+print(to_char(d))
+boolean d = true
+print(to_bool(d))
+boolean d
+print(to_bool(d))
