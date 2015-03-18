@@ -75,6 +75,12 @@ dict_follow = {"expression2": ((TOKEN_EOSTRING, None),(TOKEN_ONE_LITER_DELIMITER
 # = {"text": ((TOKEN_EOFILE, None))} #procedure_name, token_type, value (None if doesn't matter)
 
 class Travelling_Data:
+    """Data that is used in process of syntax analysis.
+    This includes: current token_type and token_number, source file object,
+                   string and position,
+                   string no.,
+                   """
+    
     def __init__(self, token_type, token_number, source, string, position, string_index, output_file):
         self.token_type = token_type
         self.token_number = token_number
@@ -90,6 +96,7 @@ class Travelling_Data:
         self._variables = ""
         
     def lexical_scan(self):
+        """wrap-up of the lexical.Scan"""
         values = lexical.Scan(self.source, self.string, self.position)
         if values is None or self.terminated:
             self.token_type = TOKEN_EOFILE
@@ -102,24 +109,34 @@ class Travelling_Data:
         
         
     def get_token_value(self):
+        """Get token value from token_type and token_number in token tables
+        (system of token tables was a requirement, could be done easier ofc)
+        """
         return get_token_value(self.token_type, self.token_number)
     
     def write(self, string):
+        """Write line of asm-code to file."""
         if not self.terminated:
             self.output_files[0].write(string)
             self.output_files[0].write("\n")
             
     def write_label(self, string):
+        """Write asm label to file.
+        Attribute string is label's name.
+        """
         if not self.terminated:
             self.output_files[0].write(string)
             self.output_files[0].write(":\n")
         
     def close(self):
+        """Close all files."""
         self.source.close()
         for output_file in self.output_files:
             output_file.close()
         
     def terminate(self, string):
+        """Terminate the execution of syntax analyser with raising the flag
+        self.terminated. This is used when error occurs."""
         if not self.terminated:
             print string
             self.terminated = True
@@ -127,7 +144,8 @@ class Travelling_Data:
     def reset_argument(self):
         self.argument = {}
             
-    def set_argument(self,keyword,value): 
+    def set_argument(self,keyword,value):
+        """For custom arguments. Might not be used currently :S"""
         self.argument[keyword] = value
     
     def get_argument(self, keyword):
@@ -156,10 +174,13 @@ class Travelling_Data:
         return True
         
     def write_variable(self, string):
+        """Save correct asm variable string for future use.
+        Needed to write all variables in the end of asm-file."""
         self._variables += string + "\n"
         
     
     def execute_variables(self):
+        """Write all asm variable strings. Used once at the end of the asm-file creating."""
         self.write(self._variables)
         
 # HELPER FUNCTIONS
