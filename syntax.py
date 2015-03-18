@@ -186,12 +186,18 @@ class Travelling_Data:
 # HELPER FUNCTIONS
 
 def get_token_value(token_type, token_number):
+    """Get token value from token tables given its type and number.
+    Tokens EOSTRING and EOFILE return None.
+    """
     if token_type == TOKEN_EOSTRING or token_type == TOKEN_EOFILE:
         return None
     else:
         return corellated_table[token_type][token_number]
 
 def in_follow(procedure_name, token_type, token_number):
+    """Boolean function: is token in FOLLOW for given procedure_name.
+    FOLLOW's are constructed in global dictionary dict_follow.
+    """
     expected_tokens = dict_follow[procedure_name]
     flag = False
     token_value = get_token_value(token_type, token_number)
@@ -203,6 +209,9 @@ def in_follow(procedure_name, token_type, token_number):
     return flag
     
 def in_first(procedure_name, token_type, token_number): #TODO DRY
+    """Boolean function: is token in FIRST for given procedure_name.
+    FIRST's are constructed in global dictionary dict_first.
+    """
     expected_tokens = dict_first[procedure_name]
     flag = False
     token_value = get_token_value(token_type, token_number)
@@ -237,6 +246,10 @@ def save_const(name):
         
 
 def check_pushed_int(data):
+    """Asm-level check: if last object in stack is int (actually any non-array variable is int).
+    If it's true, then with next "pop" you can obtain its value.
+    Else compiled program will throw an error that INT was expected.
+    """
     global PROCEDURE_COUNTER
     data.write("pop [r8w]")
     data.write("cmp [r8w], 0")
@@ -248,6 +261,10 @@ def check_pushed_int(data):
     data.write_label(ok_mark)
     
 def check_pushed_string(data):
+    """Asm-level check: if last object in stack is string or array.
+    If it's true, then with next "pop" you can obtain its length and after that every pop will be obtaining values.
+    Else compiled program will throw an error that STRING was expected.
+    """
     global PROCEDURE_COUNTER
     data.write("pop r8w")
     data.write("cmp [r8w], 1")
@@ -260,6 +277,13 @@ def check_pushed_string(data):
     
 
 def error_msg(data, name, msg):
+    """
+    Write an error message to assembler file.
+    Input parameters:
+        data - current Travelling_Data object
+        name - label for referencing message
+        msg - message text
+    """
     msg = " " + msg
     global PROCEDURE_COUNTER
     data.write_label(name)
